@@ -51,7 +51,7 @@ func TestErrManager_Errors(t *testing.T) {
 	}
 }
 
-func TestErrManager_addError(t *testing.T) {
+func TestErrManager_AddError(t *testing.T) {
 	type fields struct {
 		skipErrors bool
 	}
