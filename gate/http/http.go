@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"github.com/dmalykh/refurbedsender/gate"
 	"github.com/dmalykh/refurbedsender/sender"
 	"net/http"
@@ -32,7 +33,10 @@ func (h *Gate) send(ctx context.Context, message sender.Message) error {
 	var client = http.DefaultClient
 	client.Timeout = h.timeout
 
-	_, err = client.Do(req)
+	resp, err := client.Do(req)
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf(`response code should by %d, got %d`, http.StatusOK, resp.StatusCode)
+	}
 
 	return err
 }

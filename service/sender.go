@@ -28,7 +28,6 @@ type Sender struct {
 var ErrAddingToQueue = errors.New(`error`)
 
 // The NewSender returns configured Sender
-// If you
 func NewSender(q queue.Queue, g gate.Gate, rps uint64, skipErrors bool) sender.Sender {
 	var s = &Sender{
 		queue:      q,
