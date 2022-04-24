@@ -87,3 +87,10 @@ func TestSender_throttlingMiddlewareFuncCalledOnce(t *testing.T) {
 	wg.Wait()
 	assert.Equal(t, countCalls, called)
 }
+
+func TestSender_throttlingMiddlewareSpikes(t *testing.T) {
+	var ctx = context.TODO()
+	s := &Sender{}
+	go s.throttle(ctx, 10, 2, 1*time.Second)
+
+}

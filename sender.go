@@ -1,4 +1,4 @@
-package refurbedsender
+package sender
 
 import (
 	"github.com/dmalykh/refurbedsender/gate"
