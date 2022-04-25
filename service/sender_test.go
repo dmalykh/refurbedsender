@@ -7,6 +7,7 @@ import (
 	"github.com/dmalykh/refurbedsender/sender"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -55,13 +56,13 @@ func TestSender_Send(t *testing.T) {
 // Run created once and middleware called
 func TestSender_Run(t *testing.T) {
 	var setOptCalled int
-	var middlewareCalled int
+	var middlewareCalled int32
 
 	var middleware sender.Option = func(f sender.ProceedFunc) sender.ProceedFunc {
 		setOptCalled++
 
 		return func(ctx context.Context, message sender.Message) error {
-			middlewareCalled++
+			atomic.AddInt32(&middlewareCalled, 1)
 
 			return nil
 		}
@@ -81,7 +82,7 @@ func TestSender_Run(t *testing.T) {
 	assert.NoError(t, s.Run(ctx, middleware))
 
 	assert.Equal(t, 1, setOptCalled)
-	assert.Equal(t, 1, middlewareCalled)
+	assert.Equal(t, 1, int(atomic.LoadInt32(&middlewareCalled)))
 }
 
 func TestSender_proceedErrorAdded(t *testing.T) {

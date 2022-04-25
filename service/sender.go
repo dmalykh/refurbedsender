@@ -69,11 +69,13 @@ func (s *Sender) proceed(ctx context.Context, f sender.ProceedFunc) error {
 	}()
 
 	return s.queue.Consume(ctx, func(m sender.Message) {
-		wg.Add(1)
-		defer wg.Done()
-		if err := f(ctx, m); err != nil {
-			s.errManager.AddError(ctx, m, err)
-		}
+		go func() {
+			wg.Add(1)
+			defer wg.Done()
+			if err := f(ctx, m); err != nil {
+				s.errManager.AddError(ctx, m, err)
+			}
+		}()
 	})
 }
 
