@@ -59,31 +59,33 @@ func TestHttpGate_send(t *testing.T) {
 			},
 			server: server{
 				responseCode: 200,
-				sleep:        10 * time.Second,
+				sleep:        5 * time.Second,
 			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
-		var srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			time.Sleep(tt.server.sleep)
-			w.WriteHeader(tt.server.responseCode)
-			_, _ = w.Write([]byte(`something`)) //nolint:errcheck
-		}))
-		defer func() {
-			time.Sleep(tt.server.sleep)
-			srv.Close()
+		func() {
+			var srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				time.Sleep(tt.server.sleep)
+				w.WriteHeader(tt.server.responseCode)
+				_, _ = w.Write([]byte(`something`)) //nolint:errcheck
+			}))
+			defer func() {
+				time.Sleep(tt.server.sleep)
+				srv.Close()
+			}()
+
+			t.Run(tt.name, func(t *testing.T) {
+				var h = &Gate{
+					url:     srv.URL,
+					timeout: tt.config.timeout,
+				}
+
+				if err := h.Send(context.TODO(), sender.NewMessage([]byte{})); (err != nil) != tt.wantErr {
+					t.Errorf("send() error = %v, wantErr %v", err, tt.wantErr)
+				}
+			})
 		}()
-
-		t.Run(tt.name, func(t *testing.T) {
-			var h = &Gate{
-				url:     srv.URL,
-				timeout: tt.config.timeout,
-			}
-
-			if err := h.Send(context.TODO(), sender.NewMessage([]byte{})); (err != nil) != tt.wantErr {
-				t.Errorf("send() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
 	}
 }

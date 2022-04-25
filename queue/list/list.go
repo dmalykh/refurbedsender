@@ -17,7 +17,7 @@ func NewListQueue() *Queue {
 	}
 }
 
-// ListQueue is a simple queue based on linked list.
+// Queue is a simple queue based on linked list.
 type Queue struct {
 	list *list.List
 }
@@ -32,7 +32,7 @@ func (l *Queue) Consume(ctx context.Context, f func(message sender.Message)) err
 	for {
 		select {
 		case <-ctx.Done():
-			l.list = nil
+			l.list.Init()
 
 			return nil
 		default:

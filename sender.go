@@ -7,6 +7,6 @@ import (
 	"github.com/dmalykh/refurbedsender/service"
 )
 
-func NewSender(q queue.Queue, g gate.Gate, rps uint64, skipErrors bool) sender.Sender {
-	return service.NewSender(q, g, rps, skipErrors)
+func NewSender(q queue.Queue, g gate.Gate, skipErrors bool) sender.Sender {
+	return service.NewSender(q, g, skipErrors)
 }

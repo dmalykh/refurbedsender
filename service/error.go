@@ -50,5 +50,7 @@ func (e *errManager) AddError(ctx context.Context, m sender.Message, err error) 
 
 // Done closes the errors channel
 func (e *errManager) Done() {
-	close(e.Err)
+	if !e.skipErrors {
+		close(e.Err)
+	}
 }

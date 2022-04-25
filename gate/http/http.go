@@ -34,7 +34,7 @@ func (h *Gate) send(ctx context.Context, message sender.Message) error {
 	client.Timeout = h.timeout
 
 	resp, err := client.Do(req)
-	if resp.StatusCode != http.StatusOK {
+	if err == nil && resp.StatusCode != http.StatusOK {
 		return fmt.Errorf(`response code should by %d, got %d`, http.StatusOK, resp.StatusCode)
 	}
 
