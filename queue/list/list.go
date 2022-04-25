@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/dmalykh/refurbedsender/sender"
 	"reflect"
+	"sync"
 )
 
 var ErrUnknownValue = errors.New(`received unknown value in lists element`)
@@ -19,10 +20,13 @@ func NewListQueue() *Queue {
 
 // Queue is a simple queue based on linked list.
 type Queue struct {
+	sync.Mutex
 	list *list.List
 }
 
 func (l *Queue) Add(ctx context.Context, message sender.Message) error {
+	l.Lock()
+	defer l.Unlock()
 	l.list.PushBack(message)
 
 	return nil
@@ -36,6 +40,7 @@ func (l *Queue) Consume(ctx context.Context, f func(message sender.Message)) err
 
 			return nil
 		default:
+			l.Lock()
 			if element := l.list.Front(); element != nil {
 				message, ok := element.Value.(sender.Message)
 				if !ok {
@@ -44,6 +49,7 @@ func (l *Queue) Consume(ctx context.Context, f func(message sender.Message)) err
 				f(message)
 				l.list.Remove(element)
 			}
+			l.Unlock()
 		}
 	}
 }
